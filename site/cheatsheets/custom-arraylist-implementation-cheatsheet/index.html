@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Custom ArrayList — Implementation Cheat Sheet - Java 8 Production Reference Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Custom ArrayList \u2014 Implementation Cheat Sheet";
+        var mkdocs_page_input_path = "cheatsheets/custom-arraylist-implementation-cheatsheet.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Java 8 Production Reference Guide
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">CHEAT SHEETS</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../java-8-stream-api-interview-examples/">Java 8 Stream API & Interview Examples</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-hashmap-complete-guide/">Java HashMap — Complete Guide (Java 8, Java 21)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-list-complete-guide-java8-java21/">Java List — Cheat Sheet (Java 8, Java 21)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-concurrenthashmap-complete-guide-java8-java21/">Java ConcurrentHashMap — Cheat Sheet (Java 8, Java 21)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-8-streams-collectors-patterns/">Java 8 Streams + Collectors — Cheat Sheet</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Custom ArrayList — Implementation Cheat Sheet</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-youre-building">What you’re building</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#core-invariants">Core invariants</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#complexity-quick-table">Complexity quick table</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#resizing-strategy-ensurecapacity">Resizing strategy (ensureCapacity)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#bounds-checks">Bounds checks</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#get-set">get / set</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-append">add (append)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-insert">add (insert)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#remove-by-index">remove (by index)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#remove-by-value">remove (by value)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#indexof-lastindexof-handle-null">indexOf / lastIndexOf (handle null)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#iterator-minimal">Iterator (minimal)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#common-pitfalls">Common pitfalls</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../github-commit-workflow/">GitHub Commit Workflow — Quick Guide</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 1 — Java Fundamentals</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/java-platform-overview/">Java Platform Overview (JDK vs JRE vs JVM)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/data-types-and-operators/">Data Types and Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/control-flow/">Control Flow (if/switch/loops)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/methods-and-overloading/">Methods and Overloading</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 2 — OOP and Design Basics</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/oop-pillars/">OOP Pillars (Encapsulation, Inheritance, Polymorphism, Abstraction)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/abstract-class-vs-interface/">Abstract Class vs Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/object-contracts/">equals/hashCode/toString contracts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/immutability/">Immutability</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 3 — JVM Essentials (Interview + Production)</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/jvm-memory-areas/">JVM Memory Areas (Heap, Stack, Metaspace)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/gc-basics/">Garbage Collection Basics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/exceptions/">Exceptions (Checked vs Unchecked)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/performance-pitfalls/">Common Performance Pitfalls</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 4 — Java 8 New Language Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/lambda-expressions/">Lambda Expressions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/functional-interfaces/">Functional Interfaces</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/method-references/">Method References</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/default-methods/">Default Methods</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/static-methods-in-interfaces/">Static Methods in Interfaces</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/optional-api/">Optional API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/new-date-and-time-api/">New Date and Time API</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 5 — Java 8 Stream API</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/stream-api-overview/">Stream API Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/creating-streams/">Creating Streams</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/stream-pipeline/">Stream Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/intermediate-operations/">Intermediate Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/terminal-operations/">Terminal Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/map-vs-flatmap/">map vs flatMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/filter/">filter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/reduce/">reduce</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/collect/">collect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/parallel-streams/">parallel streams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 6 — Collectors API</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/collectors-overview/">Collectors Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/tolist/">toList</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/toset/">toSet</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/tomap/">toMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/groupingby/">groupingBy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/partitioningby/">partitioningBy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/joining/">joining</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/counting/">counting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/summarizing/">summarizing</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 7 — Collection Framework</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/collection-hierarchy/">Collection Hierarchy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/iterable-interface/">Iterable Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/iterator/">Iterator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/comparable-vs-comparator/">Comparable vs Comparator</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 8 — List Implementations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/list-interface/">List Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/arraylist-internals/">ArrayList Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/linkedlist-internals/">LinkedList Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/vector/">Vector</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/copyonwritearraylist/">CopyOnWriteArrayList</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 9 — Set Implementations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/set-interface/">Set Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/hashset-internals/">HashSet Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/linkedhashset/">LinkedHashSet</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/treeset/">TreeSet</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 10 — Map Implementations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/map-interface/">Map Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/hashmap-internals/">HashMap Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/hashmap-java-8-improvements/">HashMap Java 8 Improvements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/linkedhashmap/">LinkedHashMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/treemap/">TreeMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/weakhashmap/">WeakHashMap</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 11 — Map API Methods (Java 8)</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/putifabsent/">putIfAbsent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/compute/">compute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/computeifabsent/">computeIfAbsent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/computeifpresent/">computeIfPresent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/merge/">merge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/replace/">replace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/replaceall/">replaceAll</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/getordefault/">getOrDefault</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/foreach/">forEach</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 12 — Concurrency</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/threads-vs-processes/">Threads vs Processes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/thread-lifecycle/">Thread Lifecycle</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/synchronization/">Synchronization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/volatile-keyword/">Volatile Keyword</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/locks-and-reentrantlock/">Locks and ReentrantLock</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 13 — Executor Framework</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/executor-interface/">Executor Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/executorservice/">ExecutorService</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/threadpoolexecutor/">ThreadPoolExecutor</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/scheduledexecutorservice/">ScheduledExecutorService</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/forkjoinpool/">ForkJoinPool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 14 — CompletableFuture</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/completablefuture-overview/">CompletableFuture Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/supplyasync/">supplyAsync</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/runasync/">runAsync</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/thenapply/">thenApply</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/thencompose/">thenCompose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/thencombine/">thenCombine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/exceptionally/">exceptionally</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/allof/">allOf</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/anyof/">anyOf</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 15 — Searching Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-15/linear-search/">Linear Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-15/binary-search/">Binary Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-15/search-in-rotated-array/">Search in Rotated Array</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 16 — Sorting Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/bubble-sort/">Bubble Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/selection-sort/">Selection Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/insertion-sort/">Insertion Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/merge-sort/">Merge Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/quick-sort/">Quick Sort</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 17 — Array Interview Problems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/two-sum/">Two Sum</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/three-sum/">Three Sum</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/find-duplicate-numbers/">Find Duplicate Numbers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/missing-number/">Missing Number</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/maximum-subarray/">Maximum Subarray</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 18 — String Interview Problems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/reverse-string/">Reverse String</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/palindrome-detection/">Palindrome Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/longest-substring-without-repeating-characters/">Longest Substring Without Repeating Characters</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/anagram-detection/">Anagram Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/first-non-repeating-character/">First Non-Repeating Character</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 19 — Stream Interview Problems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/second-highest-salary/">Second Highest Salary</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/group-employees-by-department/">Group Employees by Department</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/find-duplicate-elements-using-streams/">Find Duplicate Elements Using Streams</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/convert-list-to-map/">Convert List to Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/frequency-map-using-streams/">Frequency Map Using Streams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 20 — Enterprise Java Use Cases</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/parallel-api-calls/">Parallel API Calls</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/async-database-queries/">Async Database Queries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/batch-processing/">Batch Processing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/event-driven-processing/">Event Driven Processing</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Java 8 Production Reference Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">CHEAT SHEETS</li>
+      <li class="breadcrumb-item active">Custom ArrayList — Implementation Cheat Sheet</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="custom-arraylist-implementation-cheat-sheet">Custom ArrayList — Implementation Cheat Sheet</h1>
+<h2 id="what-youre-building">What you’re building</h2>
+<p>An array-backed, resizable, index-based list.</p>
+<ul>
+<li><strong>Storage</strong>: <code>Object[] elementData</code></li>
+<li><strong>Size</strong> (logical): <code>int size</code></li>
+<li><strong>Capacity</strong> (physical): <code>elementData.length</code></li>
+</ul>
+<h2 id="core-invariants">Core invariants</h2>
+<ul>
+<li>Valid element indices: <code>0 &lt;= index &lt; size</code></li>
+<li>Valid add indices: <code>0 &lt;= index &lt;= size</code></li>
+<li>Always null out freed slots (<code>elementData[size] = null</code>) to help GC.</li>
+</ul>
+<h2 id="complexity-quick-table">Complexity quick table</h2>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>get(i)</code> / <code>set(i,x)</code></td>
+<td>O(1)</td>
+</tr>
+<tr>
+<td><code>add(x)</code> (append)</td>
+<td>Amortized O(1)</td>
+</tr>
+<tr>
+<td><code>add(i,x)</code></td>
+<td>O(n) (shift right)</td>
+</tr>
+<tr>
+<td><code>remove(i)</code></td>
+<td>O(n) (shift left)</td>
+</tr>
+<tr>
+<td><code>contains(x)</code> / <code>indexOf(x)</code></td>
+<td>O(n)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="resizing-strategy-ensurecapacity">Resizing strategy (ensureCapacity)</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ensureCapacity</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">minCapacity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">minCapacity</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">elementData</span><span class="p">.</span><span class="na">length</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">newCap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Math</span><span class="p">.</span><span class="na">max</span><span class="p">(</span><span class="n">elementData</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">minCapacity</span><span class="p">);</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">elementData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">copyOf</span><span class="p">(</span><span class="n">elementData</span><span class="p">,</span><span class="w"> </span><span class="n">newCap</span><span class="p">);</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Doubling gives amortized O(1) append.</li>
+</ul>
+<h2 id="bounds-checks">Bounds checks</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">rangeCheck</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IndexOutOfBoundsException</span><span class="p">(</span><span class="s">&quot;Index: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;, Size: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">rangeCheckForAdd</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">index</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IndexOutOfBoundsException</span><span class="p">(</span><span class="s">&quot;Index: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;, Size: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="get-set">get / set</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s">&quot;unchecked&quot;</span><span class="p">)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">rangeCheck</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="w"> </span><span class="n">elementData</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s">&quot;unchecked&quot;</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">public</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="n">rangeCheck</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="n">E</span><span class="w"> </span><span class="n">old</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="w"> </span><span class="n">elementData</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">;</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">elementData</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">old</span><span class="p">;</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="add-append">add (append)</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">E</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">ensureCapacity</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">elementData</span><span class="o">[</span><span class="n">size</span><span class="o">++]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="add-insert">add (insert)</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">rangeCheckForAdd</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">ensureCapacity</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">arraycopy</span><span class="p">(</span><span class="n">elementData</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">elementData</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">elementData</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">size</span><span class="o">++</span><span class="p">;</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="remove-by-index">remove (by index)</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@SuppressWarnings</span><span class="p">(</span><span class="s">&quot;unchecked&quot;</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">public</span><span class="w"> </span><span class="n">E</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">rangeCheck</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">E</span><span class="w"> </span><span class="n">old</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">E</span><span class="p">)</span><span class="w"> </span><span class="n">elementData</span><span class="o">[</span><span class="n">index</span><span class="o">]</span><span class="p">;</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">numMoved</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">numMoved</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">arraycopy</span><span class="p">(</span><span class="n">elementData</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">elementData</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">numMoved</span><span class="p">);</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="n">elementData</span><span class="o">[--</span><span class="n">size</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">old</span><span class="p">;</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="remove-by-value">remove (by value)</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">indexOf</span><span class="p">(</span><span class="n">o</span><span class="p">);</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">        </span><span class="n">remove</span><span class="p">(</span><span class="n">idx</span><span class="p">);</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="indexof-lastindexof-handle-null">indexOf / lastIndexOf (handle null)</h2>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">indexOf</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">elementData</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">elementData</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="kd">public</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">lastIndexOf</span><span class="p">(</span><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">elementData</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="n">elementData</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="iterator-minimal">Iterator (minimal)</h2>
+<ul>
+<li>Track <code>cursor</code> and <code>lastRet</code>.</li>
+<li><code>next()</code> returns <code>elementData[cursor++]</code>.</li>
+<li><code>remove()</code> removes <code>lastRet</code> and adjusts <code>cursor</code>.</li>
+</ul>
+<h2 id="common-pitfalls">Common pitfalls</h2>
+<ul>
+<li><strong>Forgetting to grow capacity</strong> before writes.</li>
+<li><strong>Confusing size vs capacity</strong>.</li>
+<li><strong>Not nulling removed elements</strong> (memory leak).</li>
+<li><strong>Broken index checks</strong> (<code>index == size</code> is allowed only for add).</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../java-8-streams-collectors-patterns/" class="btn btn-neutral float-left" title="Java 8 Streams + Collectors — Cheat Sheet"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../github-commit-workflow/" class="btn btn-neutral float-right" title="GitHub Commit Workflow — Quick Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../java-8-streams-collectors-patterns/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../github-commit-workflow/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/sidebar-scroll.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

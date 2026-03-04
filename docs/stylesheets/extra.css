@@ -1,0 +1,57 @@
+html, body {
+  background: #ffffff;
+  color: #111827;
+}
+
+a {
+  color: #0b5fff;
+}
+
+code, pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+pre {
+  background: #0b1220;
+  color: #e5e7eb;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  overflow: auto;
+}
+
+/* ReadTheDocs theme sometimes wraps code blocks in highlight containers */
+.rst-content div.highlight,
+.rst-content pre,
+div.highlight,
+pre {
+  border-width: 0;
+}
+
+.rst-content div.highlight,
+.rst-content div.highlight pre,
+.rst-content pre,
+div.highlight,
+div.highlight pre,
+pre {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+pre code {
+  background: transparent;
+  color: inherit;
+}
+
+:not(pre) > code {
+  background: #f3f4f6;
+  color: #111827;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.01em;
+}

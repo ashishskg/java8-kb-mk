@@ -1,0 +1,167 @@
+site_name: Java 8 Production Reference Guide
+site_description: Production-minded Java 8 reference guide (Streams, collectors, patterns, pitfalls).
+site_url: ""
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - CHEAT SHEETS:
+      - Java 8 Stream API & Interview Examples: cheatsheets/java-8-stream-api-interview-examples.md
+      - Java HashMap — Complete Guide (Java 8, Java 21): cheatsheets/java-hashmap-complete-guide.md
+      - Java List — Cheat Sheet (Java 8, Java 21): cheatsheets/java-list-complete-guide-java8-java21.md
+      - Java ConcurrentHashMap — Cheat Sheet (Java 8, Java 21): cheatsheets/java-concurrenthashmap-complete-guide-java8-java21.md
+      - Java 8 Streams + Collectors — Cheat Sheet: cheatsheets/java-8-streams-collectors-patterns.md
+      - Custom ArrayList — Implementation Cheat Sheet: cheatsheets/custom-arraylist-implementation-cheatsheet.md
+      - GitHub Commit Workflow — Quick Guide: cheatsheets/github-commit-workflow.md
+  - SECTION 1 — Java Fundamentals:
+      - Java Platform Overview (JDK vs JRE vs JVM): section-01/java-platform-overview.md
+      - Data Types and Operators: section-01/data-types-and-operators.md
+      - Control Flow (if/switch/loops): section-01/control-flow.md
+      - Methods and Overloading: section-01/methods-and-overloading.md
+  - SECTION 2 — OOP and Design Basics:
+      - OOP Pillars (Encapsulation, Inheritance, Polymorphism, Abstraction): section-02/oop-pillars.md
+      - Abstract Class vs Interface: section-02/abstract-class-vs-interface.md
+      - equals/hashCode/toString contracts: section-02/object-contracts.md
+      - Immutability: section-02/immutability.md
+  - SECTION 3 — JVM Essentials (Interview + Production):
+      - JVM Memory Areas (Heap, Stack, Metaspace): section-03/jvm-memory-areas.md
+      - Garbage Collection Basics: section-03/gc-basics.md
+      - Exceptions (Checked vs Unchecked): section-03/exceptions.md
+      - Common Performance Pitfalls: section-03/performance-pitfalls.md
+  - SECTION 4 — Java 8 New Language Features:
+      - Lambda Expressions: section-04/lambda-expressions.md
+      - Functional Interfaces: section-04/functional-interfaces.md
+      - Method References: section-04/method-references.md
+      - Default Methods: section-04/default-methods.md
+      - Static Methods in Interfaces: section-04/static-methods-in-interfaces.md
+      - Optional API: section-04/optional-api.md
+      - New Date and Time API: section-04/new-date-and-time-api.md
+  - SECTION 5 — Java 8 Stream API:
+      - Stream API Overview: section-05/stream-api-overview.md
+      - Creating Streams: section-05/creating-streams.md
+      - Stream Pipeline: section-05/stream-pipeline.md
+      - Intermediate Operations: section-05/intermediate-operations.md
+      - Terminal Operations: section-05/terminal-operations.md
+      - map vs flatMap: section-05/map-vs-flatmap.md
+      - filter: section-05/filter.md
+      - reduce: section-05/reduce.md
+      - collect: section-05/collect.md
+      - parallel streams: section-05/parallel-streams.md
+  - SECTION 6 — Collectors API:
+      - Collectors Overview: section-06/collectors-overview.md
+      - toList: section-06/tolist.md
+      - toSet: section-06/toset.md
+      - toMap: section-06/tomap.md
+      - groupingBy: section-06/groupingby.md
+      - partitioningBy: section-06/partitioningby.md
+      - joining: section-06/joining.md
+      - counting: section-06/counting.md
+      - summarizing: section-06/summarizing.md
+  - SECTION 7 — Collection Framework:
+      - Collection Hierarchy: section-07/collection-hierarchy.md
+      - Iterable Interface: section-07/iterable-interface.md
+      - Iterator: section-07/iterator.md
+      - Comparable vs Comparator: section-07/comparable-vs-comparator.md
+  - SECTION 8 — List Implementations:
+      - List Interface: section-08/list-interface.md
+      - ArrayList Internals: section-08/arraylist-internals.md
+      - LinkedList Internals: section-08/linkedlist-internals.md
+      - Vector: section-08/vector.md
+      - CopyOnWriteArrayList: section-08/copyonwritearraylist.md
+  - SECTION 9 — Set Implementations:
+      - Set Interface: section-09/set-interface.md
+      - HashSet Internals: section-09/hashset-internals.md
+      - LinkedHashSet: section-09/linkedhashset.md
+      - TreeSet: section-09/treeset.md
+  - SECTION 10 — Map Implementations:
+      - Map Interface: section-10/map-interface.md
+      - HashMap Internals: section-10/hashmap-internals.md
+      - HashMap Java 8 Improvements: section-10/hashmap-java-8-improvements.md
+      - LinkedHashMap: section-10/linkedhashmap.md
+      - TreeMap: section-10/treemap.md
+      - WeakHashMap: section-10/weakhashmap.md
+  - SECTION 11 — Map API Methods (Java 8):
+      - putIfAbsent: section-11/putifabsent.md
+      - compute: section-11/compute.md
+      - computeIfAbsent: section-11/computeifabsent.md
+      - computeIfPresent: section-11/computeifpresent.md
+      - merge: section-11/merge.md
+      - replace: section-11/replace.md
+      - replaceAll: section-11/replaceall.md
+      - getOrDefault: section-11/getordefault.md
+      - forEach: section-11/foreach.md
+  - SECTION 12 — Concurrency:
+      - Threads vs Processes: section-12/threads-vs-processes.md
+      - Thread Lifecycle: section-12/thread-lifecycle.md
+      - Synchronization: section-12/synchronization.md
+      - Volatile Keyword: section-12/volatile-keyword.md
+      - Locks and ReentrantLock: section-12/locks-and-reentrantlock.md
+  - SECTION 13 — Executor Framework:
+      - Executor Interface: section-13/executor-interface.md
+      - ExecutorService: section-13/executorservice.md
+      - ThreadPoolExecutor: section-13/threadpoolexecutor.md
+      - ScheduledExecutorService: section-13/scheduledexecutorservice.md
+      - ForkJoinPool: section-13/forkjoinpool.md
+  - SECTION 14 — CompletableFuture:
+      - CompletableFuture Overview: section-14/completablefuture-overview.md
+      - supplyAsync: section-14/supplyasync.md
+      - runAsync: section-14/runasync.md
+      - thenApply: section-14/thenapply.md
+      - thenCompose: section-14/thencompose.md
+      - thenCombine: section-14/thencombine.md
+      - exceptionally: section-14/exceptionally.md
+      - allOf: section-14/allof.md
+      - anyOf: section-14/anyof.md
+  - SECTION 15 — Searching Algorithms:
+      - Linear Search: section-15/linear-search.md
+      - Binary Search: section-15/binary-search.md
+      - Search in Rotated Array: section-15/search-in-rotated-array.md
+  - SECTION 16 — Sorting Algorithms:
+      - Bubble Sort: section-16/bubble-sort.md
+      - Selection Sort: section-16/selection-sort.md
+      - Insertion Sort: section-16/insertion-sort.md
+      - Merge Sort: section-16/merge-sort.md
+      - Quick Sort: section-16/quick-sort.md
+  - SECTION 17 — Array Interview Problems:
+      - Two Sum: section-17/two-sum.md
+      - Three Sum: section-17/three-sum.md
+      - Find Duplicate Numbers: section-17/find-duplicate-numbers.md
+      - Missing Number: section-17/missing-number.md
+      - Maximum Subarray: section-17/maximum-subarray.md
+  - SECTION 18 — String Interview Problems:
+      - Reverse String: section-18/reverse-string.md
+      - Palindrome Detection: section-18/palindrome-detection.md
+      - Longest Substring Without Repeating Characters: section-18/longest-substring-without-repeating-characters.md
+      - Anagram Detection: section-18/anagram-detection.md
+      - First Non-Repeating Character: section-18/first-non-repeating-character.md
+  - SECTION 19 — Stream Interview Problems:
+      - Second Highest Salary: section-19/second-highest-salary.md
+      - Group Employees by Department: section-19/group-employees-by-department.md
+      - Find Duplicate Elements Using Streams: section-19/find-duplicate-elements-using-streams.md
+      - Convert List to Map: section-19/convert-list-to-map.md
+      - Frequency Map Using Streams: section-19/frequency-map-using-streams.md
+  - SECTION 20 — Enterprise Java Use Cases:
+      - Parallel API Calls: section-20/parallel-api-calls.md
+      - Async Database Queries: section-20/async-database-queries.md
+      - Batch Processing: section-20/batch-processing.md
+      - Event Driven Processing: section-20/event-driven-processing.md
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/sidebar-scroll.js
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+
+repo_url: ""
+edit_uri: ""

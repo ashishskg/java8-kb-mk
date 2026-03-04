@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Java List — Cheat Sheet (Java 8, Java 21) - Java 8 Production Reference Guide</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../stylesheets/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Java List \u2014 Cheat Sheet (Java 8, Java 21)";
+        var mkdocs_page_input_path = "cheatsheets/java-list-complete-guide-java8-java21.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> Java 8 Production Reference Guide
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">CHEAT SHEETS</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../java-8-stream-api-interview-examples/">Java 8 Stream API & Interview Examples</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-hashmap-complete-guide/">Java HashMap — Complete Guide (Java 8, Java 21)</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Java List — Cheat Sheet (Java 8, Java 21)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#what-list-guarantees">What List guarantees</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#common-implementations">Common implementations</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#core-methods-with-gotchas">Core methods (with gotchas)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add">Add</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#read-update">Read / update</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#remove-overload-trap">Remove (overload trap)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#bulk-ops">Bulk ops</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#contains-index">Contains / index</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sublist-view-not-copy">subList (view, not copy)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#convert">Convert</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#java-8-functional-list-operations">Java 8: functional list operations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#replaceall">replaceAll</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sort">sort</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#remove-by-predicate">Remove by predicate</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#list-transforms-java-8">List transforms (Java 8)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#list-list-map">List → List (map)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#list-map">List → Map</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#groupby-partition">groupBy / partition</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#java-21-sequencedcollection-additions">Java 21 (SequencedCollection) additions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#quick-choose-this">Quick “choose this”</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-concurrenthashmap-complete-guide-java8-java21/">Java ConcurrentHashMap — Cheat Sheet (Java 8, Java 21)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../java-8-streams-collectors-patterns/">Java 8 Streams + Collectors — Cheat Sheet</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-arraylist-implementation-cheatsheet/">Custom ArrayList — Implementation Cheat Sheet</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../github-commit-workflow/">GitHub Commit Workflow — Quick Guide</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 1 — Java Fundamentals</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/java-platform-overview/">Java Platform Overview (JDK vs JRE vs JVM)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/data-types-and-operators/">Data Types and Operators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/control-flow/">Control Flow (if/switch/loops)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-01/methods-and-overloading/">Methods and Overloading</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 2 — OOP and Design Basics</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/oop-pillars/">OOP Pillars (Encapsulation, Inheritance, Polymorphism, Abstraction)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/abstract-class-vs-interface/">Abstract Class vs Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/object-contracts/">equals/hashCode/toString contracts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-02/immutability/">Immutability</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 3 — JVM Essentials (Interview + Production)</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/jvm-memory-areas/">JVM Memory Areas (Heap, Stack, Metaspace)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/gc-basics/">Garbage Collection Basics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/exceptions/">Exceptions (Checked vs Unchecked)</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-03/performance-pitfalls/">Common Performance Pitfalls</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 4 — Java 8 New Language Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/lambda-expressions/">Lambda Expressions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/functional-interfaces/">Functional Interfaces</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/method-references/">Method References</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/default-methods/">Default Methods</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/static-methods-in-interfaces/">Static Methods in Interfaces</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/optional-api/">Optional API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-04/new-date-and-time-api/">New Date and Time API</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 5 — Java 8 Stream API</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/stream-api-overview/">Stream API Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/creating-streams/">Creating Streams</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/stream-pipeline/">Stream Pipeline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/intermediate-operations/">Intermediate Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/terminal-operations/">Terminal Operations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/map-vs-flatmap/">map vs flatMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/filter/">filter</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/reduce/">reduce</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/collect/">collect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-05/parallel-streams/">parallel streams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 6 — Collectors API</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/collectors-overview/">Collectors Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/tolist/">toList</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/toset/">toSet</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/tomap/">toMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/groupingby/">groupingBy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/partitioningby/">partitioningBy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/joining/">joining</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/counting/">counting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-06/summarizing/">summarizing</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 7 — Collection Framework</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/collection-hierarchy/">Collection Hierarchy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/iterable-interface/">Iterable Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/iterator/">Iterator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-07/comparable-vs-comparator/">Comparable vs Comparator</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 8 — List Implementations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/list-interface/">List Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/arraylist-internals/">ArrayList Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/linkedlist-internals/">LinkedList Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/vector/">Vector</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-08/copyonwritearraylist/">CopyOnWriteArrayList</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 9 — Set Implementations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/set-interface/">Set Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/hashset-internals/">HashSet Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/linkedhashset/">LinkedHashSet</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-09/treeset/">TreeSet</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 10 — Map Implementations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/map-interface/">Map Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/hashmap-internals/">HashMap Internals</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/hashmap-java-8-improvements/">HashMap Java 8 Improvements</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/linkedhashmap/">LinkedHashMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/treemap/">TreeMap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-10/weakhashmap/">WeakHashMap</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 11 — Map API Methods (Java 8)</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/putifabsent/">putIfAbsent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/compute/">compute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/computeifabsent/">computeIfAbsent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/computeifpresent/">computeIfPresent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/merge/">merge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/replace/">replace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/replaceall/">replaceAll</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/getordefault/">getOrDefault</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-11/foreach/">forEach</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 12 — Concurrency</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/threads-vs-processes/">Threads vs Processes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/thread-lifecycle/">Thread Lifecycle</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/synchronization/">Synchronization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/volatile-keyword/">Volatile Keyword</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-12/locks-and-reentrantlock/">Locks and ReentrantLock</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 13 — Executor Framework</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/executor-interface/">Executor Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/executorservice/">ExecutorService</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/threadpoolexecutor/">ThreadPoolExecutor</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/scheduledexecutorservice/">ScheduledExecutorService</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-13/forkjoinpool/">ForkJoinPool</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 14 — CompletableFuture</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/completablefuture-overview/">CompletableFuture Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/supplyasync/">supplyAsync</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/runasync/">runAsync</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/thenapply/">thenApply</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/thencompose/">thenCompose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/thencombine/">thenCombine</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/exceptionally/">exceptionally</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/allof/">allOf</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-14/anyof/">anyOf</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 15 — Searching Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-15/linear-search/">Linear Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-15/binary-search/">Binary Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-15/search-in-rotated-array/">Search in Rotated Array</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 16 — Sorting Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/bubble-sort/">Bubble Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/selection-sort/">Selection Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/insertion-sort/">Insertion Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/merge-sort/">Merge Sort</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-16/quick-sort/">Quick Sort</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 17 — Array Interview Problems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/two-sum/">Two Sum</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/three-sum/">Three Sum</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/find-duplicate-numbers/">Find Duplicate Numbers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/missing-number/">Missing Number</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-17/maximum-subarray/">Maximum Subarray</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 18 — String Interview Problems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/reverse-string/">Reverse String</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/palindrome-detection/">Palindrome Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/longest-substring-without-repeating-characters/">Longest Substring Without Repeating Characters</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/anagram-detection/">Anagram Detection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-18/first-non-repeating-character/">First Non-Repeating Character</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 19 — Stream Interview Problems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/second-highest-salary/">Second Highest Salary</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/group-employees-by-department/">Group Employees by Department</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/find-duplicate-elements-using-streams/">Find Duplicate Elements Using Streams</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/convert-list-to-map/">Convert List to Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-19/frequency-map-using-streams/">Frequency Map Using Streams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">SECTION 20 — Enterprise Java Use Cases</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/parallel-api-calls/">Parallel API Calls</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/async-database-queries/">Async Database Queries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/batch-processing/">Batch Processing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../section-20/event-driven-processing/">Event Driven Processing</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Java 8 Production Reference Guide</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">CHEAT SHEETS</li>
+      <li class="breadcrumb-item active">Java List — Cheat Sheet (Java 8, Java 21)</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="java-list-cheat-sheet-java-8-java-21">Java List — Cheat Sheet (Java 8, Java 21)</h1>
+<h2 id="what-list-guarantees">What <code>List</code> guarantees</h2>
+<ul>
+<li><strong>Ordered</strong> (preserves insertion order)</li>
+<li><strong>Index-based access</strong> (<code>get(i)</code>, <code>set(i, x)</code>)</li>
+<li><strong>Duplicates allowed</strong></li>
+<li><strong>Nulls</strong></li>
+<li>Allowed in <code>ArrayList</code>, <code>LinkedList</code></li>
+<li>Not allowed in <code>List.of(...)</code> / <code>List.copyOf(...)</code> (throws <code>NullPointerException</code>)</li>
+</ul>
+<h2 id="common-implementations">Common implementations</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Best for</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ArrayList</code></td>
+<td>Fast random access</td>
+<td><code>get</code>/<code>set</code> are O(1); middle inserts/removes O(n)</td>
+</tr>
+<tr>
+<td><code>LinkedList</code></td>
+<td>Frequent add/remove at ends</td>
+<td>Index access is O(n); also implements <code>Deque</code></td>
+</tr>
+<tr>
+<td><code>CopyOnWriteArrayList</code></td>
+<td>Many reads, few writes</td>
+<td>Writes copy the entire array</td>
+</tr>
+<tr>
+<td><code>List.of(...)</code> (Java 9+)</td>
+<td>Immutable lists</td>
+<td>Fixed, unmodifiable, no nulls</td>
+</tr>
+<tr>
+<td><code>Arrays.asList(...)</code></td>
+<td>Fixed-size view of array</td>
+<td>No structural change (<code>add/remove</code> throws)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="core-methods-with-gotchas">Core methods (with gotchas)</h2>
+<h3 id="add">Add</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">l</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">);</span><span class="w">               </span><span class="c1">// append</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">l</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;first&quot;</span><span class="p">);</span><span class="w">        </span><span class="c1">// insert</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">l</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;y&quot;</span><span class="p">));</span>
+</span></code></pre></div>
+<ul>
+<li><code>add(int, E)</code> shifts elements to the right (O(n)).</li>
+</ul>
+<h3 id="read-update">Read / update</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;c&quot;</span><span class="p">));</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">String</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">           </span><span class="c1">// &quot;b&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">String</span><span class="w"> </span><span class="n">old</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">);</span><span class="w">   </span><span class="c1">// old=&quot;b&quot;, l=[a, B, c]</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kt">int</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">size</span><span class="p">();</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kt">boolean</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="remove-overload-trap">Remove (overload trap)</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">));</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">l</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w">                 </span><span class="c1">// removes index 1 =&gt; removes 20</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">l</span><span class="p">.</span><span class="na">remove</span><span class="p">(</span><span class="n">Integer</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">30</span><span class="p">));</span><span class="w"> </span><span class="c1">// removes element 30</span>
+</span></code></pre></div>
+<ul>
+<li>For <code>List&lt;Integer&gt;</code>, <code>remove(1)</code> calls <strong>remove by index</strong>. Use <code>Integer.valueOf(...)</code> to remove by value.</li>
+</ul>
+<h3 id="bulk-ops">Bulk ops</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">));</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">l</span><span class="p">.</span><span class="na">removeAll</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">));</span><span class="w">     </span><span class="c1">// [1,3,5]</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">l</span><span class="p">.</span><span class="na">retainAll</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">));</span><span class="w">     </span><span class="c1">// [1,5]</span>
+</span></code></pre></div>
+<h3 id="contains-index">Contains / index</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;c&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">l</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">);</span><span class="w">      </span><span class="c1">// true</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">l</span><span class="p">.</span><span class="na">indexOf</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">);</span><span class="w">       </span><span class="c1">// 1</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">l</span><span class="p">.</span><span class="na">lastIndexOf</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">);</span><span class="w">   </span><span class="c1">// 3</span>
+</span></code></pre></div>
+<h3 id="sublist-view-not-copy"><code>subList</code> (view, not copy)</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="s">&quot;c&quot;</span><span class="p">,</span><span class="s">&quot;d&quot;</span><span class="p">));</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">subList</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"> </span><span class="c1">// [b, c]</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">sub</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;B&quot;</span><span class="p">);</span><span class="w">                 </span><span class="c1">// l becomes [a, B, c, d]</span>
+</span></code></pre></div>
+<ul>
+<li><code>subList</code> is a <strong>view</strong> backed by the original list.</li>
+</ul>
+<h3 id="convert">Convert</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;c&quot;</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">Object</span><span class="o">[]</span><span class="w"> </span><span class="n">a1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">toArray</span><span class="p">();</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">a2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">toArray</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="java-8-functional-list-operations">Java 8: functional list operations</h2>
+<h3 id="replaceall"><code>replaceAll</code></h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">));</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">l</span><span class="p">.</span><span class="na">replaceAll</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// [2,4,6]</span>
+</span></code></pre></div>
+<h3 id="sort"><code>sort</code></h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">));</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">l</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">Comparator</span><span class="p">.</span><span class="na">naturalOrder</span><span class="p">());</span><span class="w"> </span><span class="c1">// [1,2,3]</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">l</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">Comparator</span><span class="p">.</span><span class="na">reverseOrder</span><span class="p">());</span><span class="w"> </span><span class="c1">// [3,2,1]</span>
+</span></code></pre></div>
+<h3 id="remove-by-predicate">Remove by predicate</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="s">&quot;bb&quot;</span><span class="p">,</span><span class="s">&quot;c&quot;</span><span class="p">));</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">l</span><span class="p">.</span><span class="na">removeIf</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// [bb]</span>
+</span></code></pre></div>
+<h2 id="list-transforms-java-8">List transforms (Java 8)</h2>
+<h3 id="list-list-map">List → List (map)</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;apple&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;banana&quot;</span><span class="p">);</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="p">.</span><span class="na">map</span><span class="p">(</span><span class="n">String</span><span class="p">::</span><span class="n">toUpperCase</span><span class="p">)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toList</span><span class="p">());</span>
+</span></code></pre></div>
+<h3 id="list-map">List → Map</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;apple&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;banana&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mango&quot;</span><span class="p">);</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1">// key=string, value=length</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toMap</span><span class="p">(</span><span class="n">Function</span><span class="p">.</span><span class="na">identity</span><span class="p">(),</span><span class="w"> </span><span class="n">String</span><span class="p">::</span><span class="n">length</span><span class="p">));</span>
+</span></code></pre></div>
+<p>Duplicates (merge):</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">freq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">toMap</span><span class="p">(</span><span class="n">Function</span><span class="p">.</span><span class="na">identity</span><span class="p">(),</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Integer</span><span class="p">::</span><span class="n">sum</span><span class="p">));</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="c1">// {a=2, b=1}</span>
+</span></code></pre></div>
+<h3 id="groupby-partition">groupBy / partition</h3>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;apple&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;apricot&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;banana&quot;</span><span class="p">);</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">byFirst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">groupingBy</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)));</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="n">Map</span><span class="o">&lt;</span><span class="n">Boolean</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">partition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in</span><span class="p">.</span><span class="na">stream</span><span class="p">()</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="p">.</span><span class="na">collect</span><span class="p">(</span><span class="n">Collectors</span><span class="p">.</span><span class="na">partitioningBy</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">6</span><span class="p">));</span>
+</span></code></pre></div>
+<h2 id="java-21-sequencedcollection-additions">Java 21 (SequencedCollection) additions</h2>
+<p><code>List</code> extends <code>SequencedCollection</code> in Java 21.</p>
+<div class="language-java highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="s">&quot;c&quot;</span><span class="p">));</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">l</span><span class="p">.</span><span class="na">getFirst</span><span class="p">();</span><span class="w">     </span><span class="c1">// &quot;a&quot;</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">l</span><span class="p">.</span><span class="na">getLast</span><span class="p">();</span><span class="w">      </span><span class="c1">// &quot;c&quot;</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">l</span><span class="p">.</span><span class="na">reversed</span><span class="p">();</span><span class="w"> </span><span class="c1">// view: [c,b,a]</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="n">l</span><span class="p">.</span><span class="na">addFirst</span><span class="p">(</span><span class="s">&quot;0&quot;</span><span class="p">);</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="n">l</span><span class="p">.</span><span class="na">addLast</span><span class="p">(</span><span class="s">&quot;d&quot;</span><span class="p">);</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="n">l</span><span class="p">.</span><span class="na">removeFirst</span><span class="p">();</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="n">l</span><span class="p">.</span><span class="na">removeLast</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="quick-choose-this">Quick “choose this”</h2>
+<ul>
+<li>Use <strong><code>ArrayList</code></strong> by default.</li>
+<li>Use <strong><code>LinkedList</code></strong> only when you truly need deque-like behavior and you don’t do lots of <code>get(i)</code>.</li>
+<li>Use <strong><code>List.of</code> / <code>List.copyOf</code></strong> for immutable lists.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../java-hashmap-complete-guide/" class="btn btn-neutral float-left" title="Java HashMap — Complete Guide (Java 8, Java 21)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../java-concurrenthashmap-complete-guide-java8-java21/" class="btn btn-neutral float-right" title="Java ConcurrentHashMap — Cheat Sheet (Java 8, Java 21)">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../java-hashmap-complete-guide/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../java-concurrenthashmap-complete-guide-java8-java21/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/sidebar-scroll.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
